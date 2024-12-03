@@ -80,88 +80,7 @@ public class GUI extends JFrame{
 
         /* ---------------------------------------------- middle panel -------------------------------------------------- */ 
         middlePanel = new JPanel(new GridBagLayout());
-        boardPanel = new JPanel(new GridBagLayout());
-
-        // constraints for middle panel (for board panel)
-        GridBagConstraints mpgbc = new GridBagConstraints();
-        mpgbc.insets = new Insets(20, 20, 20, 20);
-        mpgbc.fill = GridBagConstraints.BOTH;
-        mpgbc.weightx = 1;
-        mpgbc.weighty = 1;
-
-        // add board panel to middle panel
-        middlePanel.add(boardPanel, mpgbc);
-
-        // constraints for board panel
-        GridBagConstraints boardgbc = new GridBagConstraints();
-        boardgbc.fill = GridBagConstraints.BOTH;
-        boardgbc.weightx = 1;
-        boardgbc.weighty = 1;
-
-        // the board
-        board = new JButton[8][5];
-        for(int i = 0; i < 8; i++) {
-            for(int j = 0; j < 5; j++) {
-                board[i][j] = new JButton();
-                boardgbc.gridx = j;
-                boardgbc.gridy = i;
-                boardPanel.add(board[i][j], boardgbc);
-            }
-        }
-
-        // Add resize logic to maintain square buttons
-        boardPanel.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                int panelWidth = boardPanel.getWidth();
-                int panelHeight = boardPanel.getHeight();
-                int buttonWidth = panelWidth / 5;
-                int buttonHeight = panelHeight / 8;
-                int buttonSize = Math.min(buttonWidth, buttonHeight);
-
-                for (int i = 0; i < 8; i++) {
-                    for (int j = 0; j < 5; j++) {
-                        board[i][j].setPreferredSize(new Dimension(buttonSize, buttonSize));
-                    }
-                }
-                boardPanel.revalidate();
-                boardPanel.repaint();
-            }
-        });
-
-
-        // this is for middle panel
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.weighty = 60;
-        add(middlePanel, gbc);
-        
-        setVisible(true);
-    }
-}
-
-
-//this is what i want to create square buttons
-
-/* import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-
-public class GUI extends JFrame {
-    private JButton[][] board;
-    private JPanel boardPanel;
-
-    public GUI() {
-        // Basic frame setup
-        super("Kwazam Chess");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(800, 600);
-
-        // Use BorderLayout
-        setLayout(new BorderLayout());
-
-        // Create board panel with custom layout
-        boardPanel = new JPanel() {
+        boardPanel = new JPanel(){
             @Override
             public void doLayout() {
                 int width = getWidth();
@@ -173,9 +92,13 @@ public class GUI extends JFrame {
                 
                 int cellWidth = width / columns;
                 int cellHeight = height / rows;
-                
+
                 // Use the smaller dimension to make cells square
                 int cellSize = Math.min(cellWidth, cellHeight);
+                
+                // Center the grid within the panel
+                int startX = (width - (cellSize * columns)) / 2;
+                int startY = (height - (cellSize * rows)) / 2;
                 
                 // Position buttons in a grid
                 for (Component comp : getComponents()) {
@@ -184,41 +107,52 @@ public class GUI extends JFrame {
                     int col = index % columns;
                     
                     comp.setBounds(
-                        col * cellSize, 
-                        row * cellSize, 
+                        startX + col * cellSize, 
+                        startY + row * cellSize, 
                         cellSize, 
                         cellSize
                     );
                 }
             }
-            
+
             @Override
             public boolean isOptimizedDrawingEnabled() {
                 return false;
             }
+            
         };
-        
+
         // Disable layout manager to use custom layout
         boardPanel.setLayout(null);
 
-        // Create buttons
+        // constraints for middle panel (for board panel)
+        GridBagConstraints mpgbc = new GridBagConstraints();
+        mpgbc.insets = new Insets(20, 20, 20, 20);
+        mpgbc.fill = GridBagConstraints.BOTH;
+        mpgbc.anchor = GridBagConstraints.CENTER;
+        mpgbc.weightx = 1;
+        mpgbc.weighty = 1;
+
+        // add board panel to middle panel
+        middlePanel.add(boardPanel, mpgbc);
+
+        // constraints for board panel
+
+        // the board
         board = new JButton[8][5];
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 5; j++) {
+        for(int i = 0; i < 8; i++) {
+            for(int j = 0; j < 5; j++) {
                 JButton button = new JButton("(" + i + "," + j + ")");
                 
                 // Make buttons visually distinct and square
-                button.setBackground(i % 2 == j % 2 ? Color.WHITE : Color.LIGHT_GRAY);
+                button.setBackground(Color.BLACK);
                 button.setBorderPainted(true);
                 button.setOpaque(true);
-                
+
                 board[i][j] = button;
                 boardPanel.add(button);
             }
         }
-
-        // Add board to the center of the frame
-        add(boardPanel, BorderLayout.CENTER);
 
         // Add resize listener to maintain square buttons
         addComponentListener(new ComponentAdapter() {
@@ -229,21 +163,12 @@ public class GUI extends JFrame {
             }
         });
 
-        // Ensure visibility
+        // this is for middle panel
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weighty = 60;
+        add(middlePanel, gbc);
+        
         setVisible(true);
     }
-
-    public static void main(String[] args) {
-        // Ensure GUI is created on the Event Dispatch Thread
-        SwingUtilities.invokeLater(() -> {
-            try {
-                // Set system look and feel
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            
-            new GUI();
-        });
-    }
-} */
+}
