@@ -27,7 +27,7 @@ public class GUI extends JFrame{
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 600);
 
-        //gbc constraints
+        //gbc constraints for JFrame
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
 
@@ -142,7 +142,7 @@ public class GUI extends JFrame{
         board = new JButton[8][5];
         for(int i = 0; i < 8; i++) {
             for(int j = 0; j < 5; j++) {
-                JButton button = new JButton("(" + i + "," + j + ")");
+                JButton button = new JButton();
                 
                 // Make buttons visually distinct and square
                 button.setBackground(Color.BLACK);
