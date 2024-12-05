@@ -1,0 +1,24 @@
+we do only 1 board behind the game, the gui is just showing the board, it will have a function in Game to draw the board
+
+
+1. everyturn the bord will rotate
+    - this will need a function
+
+2. for the game to determine the pieces on the board
+    - a function in GUI class will be called to get the coordinates (start and destination)
+    - when the button(the board) is clicked, the button will turn color to indicate the clicked pieces
+    - if no piece, do nothing
+    - also maybe the hover effect (OPTIONAL)
+
+3. a function in Game to draw the board
+    - in 2, thr pieces is selected, it will get the valid move from the pieces class, is the destination valid or not
+
+4. what will the player do
+    - look at the board (set it to the player turn)
+    - decide which piece to move 
+    - take the piece (player movePiece(which piece it is, and the destination))
+    - put it to the destination (same as above)
+    - drop the piece
+    - if there is piece on the position, and the piece is not the player'same (checkGotPiece(which place is the position))
+    - the piece disappear from the board, and the opponent loss a piece (player lossPiece(which place is the position))
+    - 
