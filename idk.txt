@@ -1,0 +1,278 @@
+public class Game {
+    
+    // A game would need these only to work
+    private GUI gui;
+    private Player player1; //player got their own pieces
+    private Player player2;
+
+    // keep track of the turn, odd is player 1, even is player 2
+    private int turn;
+
+    public Game() {
+        this.gui = new GUI();
+        this.player1 = new Player();
+        this.player2 = new Player();
+        this.turn = 1;
+    }
+
+    public void whichPlayer() {
+        if(this.turn % 2 == 0) {
+            player2.movePiece();
+        }
+        else {
+            player1.movePiece();
+        }
+    }
+
+    public void startGame() {
+        gui.initializeBoard();
+    }
+
+
+    // getter and setter
+    public GUI getGui() {
+        return gui;
+    }
+
+    public void setGui(GUI gui) {
+        this.gui = gui;
+    }
+
+    public Player getPlayer1() {
+        return player1;
+    }
+
+    public void setPlayer1(Player player1) {
+        this.player1 = player1;
+    }
+
+    public Player getPlayer2() {
+        return player2;
+    }
+
+    public void setPlayer2(Player player2) {
+        this.player2 = player2;
+    }
+
+    public int getTurn() {
+        return turn;
+    }
+
+    public void setTurn(int turn) {
+        this.turn = turn;
+    }
+
+}
+
+
+we do only 1 board behind the game, the gui is just showing the board, it will have a function in Game to draw the board
+
+
+1. everyturn the bord will rotate
+    - this will need a function
+
+2. for the game to determine the pieces on the board
+    - a function in GUI class will be called to get the coordinates (start and destination)
+    - when the button(the board) is clicked, the button will turn color to indicate the clicked pieces
+    - if no piece, do nothing
+    - also maybe the hover effect (OPTIONAL)
+
+3. a function in Game to draw the board
+    - in 2, thr pieces is selected, it will get the valid move from the pieces class, is the destination valid or not
+
+4. what will the player do
+    - look at the board (set it to the player turn)
+    - decide which piece to move 
+    - take the piece (player movePiece(which piece it is, and the destination))
+    - put it to the destination (same as above)
+    - drop the piece
+    - if there is piece on the position, and the piece is not the player'same (checkGotPiece(which place is the position))
+    - the piece disappear from the board, and the opponent loss a piece (player lossPiece(which place is the position))
+    -
+
+5. when the game started, the button will change its name to "New game"
+
+6. game flow
+    1. player 1 click everything, but only respond if he clicked on his pieces, or the start button
+    2. when the player click on the piece, it will show the available move by turning the board to green 
+       or the piece will follow the mouse until the user place the piece or click on other unvailable move (maybe after we done all the things)
+    3. if the player click on other place instead of the available position, the green will turn back to the normal color
+    4. after player1 turn, the game will check is the sau for the opponent (player2) still exist
+        if yes, continue to player2 turn
+        else, game end, a message come out saying that player1 win
+
+
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+
+public class GUI extends JFrame{
+
+    //the panel on the top
+    private JPanel topPanel;
+    private JLabel lbl1;
+    private JLabel lbl2;
+    private JButton start;
+
+    //the panel on the middle
+    private JPanel middlePanel;
+    private JButton[][] board;
+    private JPanel boardPanel;
+
+    //still dont know
+    private JButton newGame;
+
+
+    public GUI() {
+        super("Kwazam Chess");
+
+        setLayout(new GridBagLayout());
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(800, 600);
+
+        //gbc constraints for JFrame
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;
+
+        /* --------------------------------------------- first panel ----------------------------------------------- */
+        topPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints tpgbc = new GridBagConstraints();
+
+        // constraints for top panel
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridheight = 1;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        topPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        add(topPanel, gbc);
+
+
+        // labels for stating the player
+        lbl1 = new JLabel("Player 1");
+        lbl1.setOpaque(true);
+        lbl1.setForeground(new Color(51, 82, 119));
+        lbl1.setFont(new Font("Arial", Font.BOLD, 25));
+        lbl1.setPreferredSize(new Dimension(100, 35));
+        tpgbc.gridx = 0;
+        tpgbc.weightx = 1;
+        topPanel.add(lbl1, tpgbc);
+
+        // start button
+        start = new JButton("Start");
+        start.setPreferredSize(new Dimension(100, 35));
+        start.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //start game;
+            }
+        });
+        tpgbc.gridx = 1;
+        tpgbc.weightx = 1;
+        topPanel.add(start, tpgbc);
+
+        lbl2 = new JLabel("Player 2");
+        lbl2.setOpaque(true);
+        lbl2.setForeground(new Color(160, 2, 2));
+        lbl2.setPreferredSize(new Dimension(100, 35));
+        lbl2.setFont(new Font("Arial", Font.BOLD, 25));
+        tpgbc.gridx = 2;
+        tpgbc.weightx = 1;
+        topPanel.add(lbl2, tpgbc);
+
+
+        /* ---------------------------------------------- middle panel -------------------------------------------------- */ 
+        middlePanel = new JPanel(new GridBagLayout());
+        boardPanel = new JPanel(){
+            @Override
+            public void doLayout() {
+                int width = getWidth();
+                int height = getHeight();
+                
+                // Calculate the size of each cell based on the panel's dimensions
+                int columns = 5;
+                int rows = 8;
+                
+                int cellWidth = width / columns;
+                int cellHeight = height / rows;
+
+                // Use the smaller dimension to make cells square
+                int cellSize = Math.min(cellWidth, cellHeight);
+                
+                // Center the grid within the panel
+                int startX = (width - (cellSize * columns)) / 2;
+                int startY = (height - (cellSize * rows)) / 2;
+                
+                // Position buttons in a grid
+                for (Component comp : getComponents()) {
+                    int index = getComponentZOrder(comp);
+                    int row = index / columns;
+                    int col = index % columns;
+                    
+                    comp.setBounds(
+                        startX + col * cellSize, 
+                        startY + row * cellSize, 
+                        cellSize, 
+                        cellSize
+                    );
+                }
+            }
+
+            @Override
+            public boolean isOptimizedDrawingEnabled() {
+                return false;
+            }
+            
+        };
+
+        // Disable layout manager to use custom layout
+        boardPanel.setLayout(null);
+
+        // constraints for middle panel (for board panel)
+        GridBagConstraints mpgbc = new GridBagConstraints();
+        mpgbc.insets = new Insets(20, 20, 20, 20);
+        mpgbc.fill = GridBagConstraints.BOTH;
+        mpgbc.anchor = GridBagConstraints.CENTER;
+        mpgbc.weightx = 1;
+        mpgbc.weighty = 1;
+
+        // add board panel to middle panel
+        middlePanel.add(boardPanel, mpgbc);
+
+        // constraints for board panel
+
+        // the board
+        board = new JButton[8][5];
+        for(int i = 0; i < 8; i++) {
+            for(int j = 0; j < 5; j++) {
+                JButton button = new JButton();
+                
+                // Make buttons visually distinct and square
+                button.setBackground(Color.BLACK);
+                button.setBorderPainted(true);
+                button.setOpaque(true);
+
+                board[i][j] = button;
+                boardPanel.add(button);
+            }
+        }
+
+        // Add resize listener to maintain square buttons
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                boardPanel.revalidate();
+                boardPanel.repaint();
+            }
+        });
+
+        // this is for middle panel
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weighty = 60;
+        add(middlePanel, gbc);
+        
+        setVisible(true);
+    }
+}
